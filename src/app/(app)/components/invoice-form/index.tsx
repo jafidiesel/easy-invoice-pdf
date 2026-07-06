@@ -27,11 +27,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import type { NonReadonly, Prettify } from "@/types";
+import { calculateItemTotals } from "./utils/calculate-item-totals";
+import { formErrorsToToast } from "./utils/form-errors-to-toast";
+import { hasAnyItemTotalsChanged } from "./utils/has-item-totals-changed";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as Sentry from "@sentry/nextjs";
 import dayjs from "dayjs";
-import React, {
+import {
   memo,
   useCallback,
   useEffect,
@@ -39,23 +42,17 @@ import React, {
   type Dispatch,
   type SetStateAction,
 } from "react";
-import {
-  Controller,
-  useFieldArray,
-  useForm,
-  useWatch,
-  type FieldErrors,
-} from "react-hook-form";
+import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
 import { z } from "zod";
 
+import { updateAppMetadata } from "@/app/(app)/utils/get-app-metadata";
 import { AlertIcon, ErrorMessage } from "./common";
 import { BuyerInformation } from "./sections/buyer-information";
 import { GeneralInformation } from "./sections/general-information";
 import { InvoiceItems } from "./sections/invoice-items";
 import { SellerInformation } from "./sections/seller-information";
-import { updateAppMetadata } from "@/app/(app)/utils/get-app-metadata";
 
 export const LOADING_BUTTON_TIMEOUT = 400;
 export const LOADING_BUTTON_TEXT = "Generating Document...";
@@ -159,16 +156,8 @@ export const InvoiceForm = memo(function InvoiceForm({
     // Skip rest of calculations if no items
     if (!invoiceItems?.length) return;
 
-    // Check if any relevant values have changed
-    const hasChanges = invoiceItems.some((item) => {
-      const calculated = calculateItemTotals(item);
-      return (
-        calculated?.netAmount !== item.netAmount ||
-        calculated?.vatAmount !== item.vatAmount ||
-        calculated?.preTaxAmount !== item.preTaxAmount
-      );
-    });
-    if (!hasChanges) return;
+    // if no item totals changed (netAmount, vatAmount, preTaxAmount), skip the rest of the calculations
+    if (!hasAnyItemTotalsChanged(invoiceItems)) return;
 
     // Only update if there are actual changes
     const updatedItems = invoiceItems
@@ -455,7 +444,7 @@ export const InvoiceForm = memo(function InvoiceForm({
       {/* Final section */}
       <div className="space-y-4" data-testid={`final-section`}>
         <div className="">
-          {/* Total field (with currency) */}
+          {/* Total field (with currency) (calculated automatically - read only field in the UI) */}
           <div className="mt-5" />
           <Label htmlFor={`total`} className="mb-1">
             Total
@@ -884,102 +873,3 @@ export const InvoiceForm = memo(function InvoiceForm({
     </form>
   );
 });
-
-const calculateItemTotals = (item: InvoiceItemData | null) => {
-  if (!item) return null;
-
-  const amount = Number(item.amount) || 0;
-  const netPrice = Number(item.netPrice) || 0;
-  const calculatedNetAmount = amount * netPrice;
-  const formattedNetAmount = Number(calculatedNetAmount.toFixed(2));
-
-  let vatAmount = 0;
-
-  // item.vat always come as a string, so we need to convert it to a number ("23" -> 23) to calculate the VAT amount
-  // it also can be not a number (e.g. "NP", "OO", etc), in this case we don't calculate the VAT amount and set it to 0
-  if (item?.vat) {
-    const vatValue = Number(item.vat);
-    const isVatValueANumber = !Number.isNaN(vatValue);
-
-    if (isVatValueANumber) {
-      vatAmount = (formattedNetAmount * vatValue) / 100;
-    }
-  }
-
-  const formattedVatAmount = Number(vatAmount.toFixed(2));
-  const formattedPreTaxAmount = Number(
-    (formattedNetAmount + formattedVatAmount).toFixed(2),
-  );
-
-  return {
-    ...item,
-    netAmount: formattedNetAmount,
-    vatAmount: formattedVatAmount,
-    preTaxAmount: formattedPreTaxAmount,
-  };
-};
-
-const formErrorsToToast = ({
-  errors,
-  isMobile,
-}: {
-  errors: FieldErrors<InvoiceData>;
-  isMobile: boolean;
-}) => {
-  // Return early if there are no errors
-  if (!errors || Object.keys(errors).length === 0) {
-    return;
-  }
-  toast.error(
-    <div>
-      <p className="font-semibold">Please fix the following errors:</p>
-      <ul className="mt-1 list-inside list-disc">
-        {Object.entries(errors)
-          .map(([key, error]) => {
-            // Handle nested errors (e.g., seller.name, items[0].name)
-            if (error && typeof error === "object" && "message" in error) {
-              return (
-                <li key={key} className="text-sm">
-                  {error?.message || "Unknown error"}
-                </li>
-              );
-            }
-
-            // Handle array errors (e.g., items array)
-            if (Array.isArray(error)) {
-              return error.map((item, index) =>
-                Object.entries(
-                  item as { [key: string]: { message?: string } },
-                ).map(([fieldName, fieldError]) => (
-                  <li key={`${key}.${index}.${fieldName}`} className="text-sm">
-                    {fieldError?.message || "Unknown error"}
-                  </li>
-                )),
-              );
-            }
-
-            // Handle nested object errors
-            if (error && typeof error === "object") {
-              return Object.entries(
-                error as { [key: string]: { message?: string } },
-              ).map(([nestedKey, nestedError]) => {
-                return (
-                  <li key={`${key}.${nestedKey}`} className="text-sm">
-                    {nestedError?.message || "Unknown error"}
-                  </li>
-                );
-              });
-            }
-
-            return null;
-          })
-          .flat(Infinity)}
-      </ul>
-    </div>,
-    {
-      id: "form-errors-error-toast",
-      duration: 15_000,
-      position: isMobile ? "top-center" : "bottom-right",
-    },
-  );
-};
