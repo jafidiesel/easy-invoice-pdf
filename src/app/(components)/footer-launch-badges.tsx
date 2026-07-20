@@ -32,6 +32,33 @@ export function FooterLaunchBadges() {
         />
       </a>
 
+      {/* Badge for Verified DR */}
+      <a
+        href="https://verifieddr.com/website/easyinvoicepdf-com"
+        target="_blank"
+      >
+        <img
+          src="https://verifieddr.com/badge/easyinvoicepdf-com.svg?metric=truedr"
+          alt="Verified DR - Verified Domain Rating for easyinvoicepdf.com"
+          width="220"
+          height="68"
+        />
+      </a>
+
+      {/* Badge for Featured on Nick Launches */}
+      <a
+        href="https://nicklaunches.com/products/easyinvoicepdf/?utm_source=easyinvoicepdf.com&utm_medium=badge&utm_campaign=featured"
+        target="_blank"
+        rel="noopener"
+      >
+        <img
+          src="https://nicklaunches.com/badges/featured.png"
+          alt="EasyInvoicePDF on Nick Launches"
+          width="244"
+          height="56"
+        />
+      </a>
+
       {/* Badge for Launched on Tiny Startups */}
       <a
         href="https://www.tinystartups.com/startup/easyinvoicepdf"
@@ -102,19 +129,6 @@ export function FooterLaunchBadges() {
             tinystartups.com
           </span>
         </span>
-      </a>
-
-      {/* Badge for Verified DR */}
-      <a
-        href="https://verifieddr.com/website/easyinvoicepdf-com"
-        target="_blank"
-      >
-        <img
-          src="https://verifieddr.com/badge/easyinvoicepdf-com.svg?metric=truedr"
-          alt="Verified DR - Verified Domain Rating for easyinvoicepdf.com"
-          width="220"
-          height="68"
-        />
       </a>
     </>
   );
