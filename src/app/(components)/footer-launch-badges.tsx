@@ -103,6 +103,19 @@ export function FooterLaunchBadges() {
           </span>
         </span>
       </a>
+
+      {/* Badge for Verified DR */}
+      <a
+        href="https://verifieddr.com/website/easyinvoicepdf-com"
+        target="_blank"
+      >
+        <img
+          src="https://verifieddr.com/badge/easyinvoicepdf-com.svg?metric=truedr"
+          alt="Verified DR - Verified Domain Rating for easyinvoicepdf.com"
+          width="220"
+          height="68"
+        />
+      </a>
     </>
   );
 }
