@@ -1,3 +1,4 @@
+import { FooterSkeleton } from "@/app/(components)/footer-skeleton";
 import { HeaderSkeleton } from "@/app/(components)/header/header-skeleton";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -91,45 +92,7 @@ export default function AboutLoading() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="flex w-full items-center justify-center border-t border-slate-200 bg-white py-12 md:py-16 lg:py-20">
-        <div className="container px-4 md:px-6">
-          <div className="flex flex-col gap-10 md:flex-row">
-            <div className="space-y-4 md:w-1/3">
-              <div className="flex items-center gap-1 sm:gap-2">
-                <Skeleton className="size-6 md:size-7" />
-                <div className="flex flex-col">
-                  <Skeleton className="h-6 w-40" />
-                </div>
-              </div>
-              <Skeleton className="h-16 w-full" />
-              <div className="flex gap-4">
-                <Skeleton className="h-5 w-5" />
-                <Skeleton className="h-5 w-5" />
-              </div>
-            </div>
-            <div className="grid grid-cols-1 sm:gap-10 md:flex-1 md:grid-cols-2">
-              <div className="space-y-3" />
-              <div className="space-y-3">
-                <Skeleton className="h-5 w-24" />
-                <div className="space-y-2">
-                  {Array.from({ length: 4 }).map((_, i) => (
-                    <Skeleton key={i} className="h-4 w-32" />
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="my-5 max-w-lg space-y-2">
-            <Skeleton className="h-5 w-32" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-          <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-8 md:flex-row">
-            <Skeleton className="h-4 w-48" />
-            <Skeleton className="h-4 w-48" />
-          </div>
-        </div>
-      </footer>
+      <FooterSkeleton />
     </div>
   );
 }

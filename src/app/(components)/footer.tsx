@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-html-link-for-pages */
+import { FooterLaunchBadges } from "@/app/(components)/footer-launch-badges";
 import { SEO_FOOTER_SOLUTION_LINKS } from "@/app/(seo-landings)/seo-landing-footer-links";
 import { ProjectLogo } from "@/components/etc/project-logo";
 import {
@@ -112,104 +113,7 @@ export function Footer({ links, translations }: FooterProps) {
         </div>
         {/* LAUNCH Badges */}
         <div className="mb-7 mt-10 flex flex-wrap items-center gap-3">
-          {/* Badge for featured on Startup Fame */}
-          <a
-            href="https://startupfa.me/s/easyinvoicepdf?utm_source=easyinvoicepdf.com"
-            target="_blank"
-          >
-            <img
-              src="https://startupfa.me/badges/featured/light-rounded.webp"
-              alt="EasyInvoicePDF - Featured on Startup Fame"
-              width="171"
-              height="54"
-            />
-          </a>
-
-          {/* Badge for Launched on LaunchPanda */}
-          <a
-            href="https://launchpanda.dev/launches/productivity/easyinvoicepdf"
-            target="_blank"
-            rel="noopener"
-          >
-            <img
-              src="https://launchpanda.dev/images/badges/launchpanda-badge.svg"
-              alt="Launched on LaunchPanda"
-              width="260"
-              height="64"
-            />
-          </a>
-
-          {/* Badge for Launched on Tiny Startups */}
-          <a
-            href="https://www.tinystartups.com/startup/easyinvoicepdf"
-            target="_blank"
-            rel="noopener"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 14,
-              padding: "14px 22px 14px 18px",
-              borderRadius: 14,
-              textDecoration: "none",
-              fontFamily: "'Inter',system-ui,sans-serif",
-              background:
-                "linear-gradient(#fff,#fff) padding-box,linear-gradient(90deg,#3525E6,#D81FE0,#22B8F0) border-box",
-              border: "2px solid transparent",
-              color: "#0E0B1F",
-            }}
-          >
-            <svg width="56" height="56" viewBox="0 0 100 100">
-              <defs>
-                <linearGradient id="tsg" x1=".1" y1="0" x2=".9" y2="1">
-                  <stop offset="0%" stopColor="#3525E6" />
-                  <stop offset="55%" stopColor="#D81FE0" />
-                  <stop offset="100%" stopColor="#22B8F0" />
-                </linearGradient>
-              </defs>
-              <path
-                d="M50 6C52 32 68 48 94 50C68 52 52 68 50 94C48 68 32 52 6 50C32 48 48 32 50 6Z"
-                fill="url(#tsg)"
-              />
-            </svg>
-            <span
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                lineHeight: 1.15,
-              }}
-            >
-              <span
-                style={{
-                  fontFamily: "monospace",
-                  fontSize: 9,
-                  fontWeight: 600,
-                  letterSpacing: 0.18,
-                  textTransform: "uppercase",
-                  color: "#6A6585",
-                }}
-              >
-                Launched on
-              </span>
-              <span
-                style={{
-                  fontSize: 22,
-                  fontWeight: 800,
-                  letterSpacing: -0.025,
-                }}
-              >
-                Tiny Startups
-              </span>
-              <span
-                style={{
-                  fontSize: 11,
-                  color: "#6A6585",
-                  marginTop: 4,
-                }}
-              >
-                tinystartups.com
-              </span>
-            </span>
-          </a>
+          <FooterLaunchBadges />
         </div>
 
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-8 md:flex-row">
