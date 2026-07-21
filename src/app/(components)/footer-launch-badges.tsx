@@ -59,6 +59,20 @@ export function FooterLaunchBadges() {
         />
       </a>
 
+      {/* Badge for Featured on Huzzler */}
+      <a
+        href="https://huzzler.so/products/WoT22LdqV0/easyinvoicepdf?utm_source=huzzler_product_website&utm_medium=badge&utm_campaign=free_listing"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <img
+          alt="Huzzler Embed Badge"
+          src="https://huzzler.so/assets/images/embeddable-badges/featured.png"
+          width="159"
+          height="55"
+        />
+      </a>
+
       {/* Badge for Launched on Tiny Startups */}
       <a
         href="https://www.tinystartups.com/startup/easyinvoicepdf"
