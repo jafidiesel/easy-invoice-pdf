@@ -8,7 +8,6 @@ import {
   type Metadata,
   DEFAULT_MOBILE_TAB,
 } from "@/app/schema";
-import * as Sentry from "@sentry/nextjs";
 import dayjs from "dayjs";
 
 export const DEFAULT_METADATA = {
@@ -50,7 +49,7 @@ export function getAppMetadata() {
         validatedMetadata.error,
       );
 
-      Sentry.captureException(validatedMetadata.error);
+      console.error(validatedMetadata.error);
 
       return null;
     }
@@ -59,7 +58,7 @@ export function getAppMetadata() {
   } catch (error) {
     console.error("[getAppMetadata] Error parsing invoice metadata:", error);
 
-    Sentry.captureException(error);
+    console.error(error);
 
     return null;
   }
@@ -83,7 +82,7 @@ export function getAppMetadata() {
  * @remarks
  * - If no existing metadata is found, the function returns early without updating
  * - Validates the updated metadata against the metadataSchema before saving
- * - Logs validation errors and exceptions to console and Sentry
+ * - Logs validation errors and exceptions to console
  * - Does not throw errors; failures are logged and handled gracefully
  */
 export function updateAppMetadata(updater: (current: Metadata) => Metadata) {
@@ -107,7 +106,7 @@ export function updateAppMetadata(updater: (current: Metadata) => Metadata) {
         JSON.stringify(DEFAULT_METADATA),
       );
 
-      Sentry.captureException(parsed.error);
+      console.error(parsed.error);
 
       return;
     }
@@ -119,6 +118,6 @@ export function updateAppMetadata(updater: (current: Metadata) => Metadata) {
     );
   } catch (error) {
     console.error("[updateAppMetadata] Failed to save metadata:", error);
-    Sentry.captureException(error);
+    console.error(error);
   }
 }

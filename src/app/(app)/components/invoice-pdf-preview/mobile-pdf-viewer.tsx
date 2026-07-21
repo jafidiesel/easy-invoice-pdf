@@ -6,7 +6,6 @@ import { InvoicePdfTemplate } from "@/app/(app)/components/invoice-templates/inv
 import { StripeInvoicePdfTemplate } from "@/app/(app)/components/invoice-templates/invoice-pdf-stripe-template";
 
 import { BUG_REPORT_URL } from "@/config";
-import * as Sentry from "@sentry/nextjs";
 import { useMemo, useState } from "react";
 
 // This import registers the PDF.js worker globally so that react-pdf can render PDFs in the browser.
@@ -157,7 +156,7 @@ export const MobileInvoicePDFViewer = ({
                   </div>
                 }
                 onLoadError={(error) => {
-                  Sentry.captureException(error);
+                  console.error(error);
                 }}
                 height={450}
                 width={650}

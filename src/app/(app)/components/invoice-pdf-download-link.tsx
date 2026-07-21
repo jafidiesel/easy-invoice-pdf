@@ -6,10 +6,8 @@ import {
   type SupportedLanguages,
 } from "@/app/schema";
 import { ErrorGeneratingPdfToast } from "@/components/ui/toasts/error-generating-pdf-toast";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { cn } from "@/lib/utils";
 import { usePDF } from "@react-pdf/renderer/lib/react-pdf.browser";
-import * as Sentry from "@sentry/nextjs";
 import dayjs from "dayjs";
 import { Loader2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -20,8 +18,6 @@ import { CustomTooltip } from "@/components/ui/tooltip";
 import { useDeviceContext } from "@/contexts/device-context";
 import { isTelegramInAppBrowser } from "@/utils/is-telegram-in-app-browser";
 import { updateAppMetadata } from "../utils/get-app-metadata";
-import { useCTAToast } from "../contexts/cta-toast-context";
-import { CTA_TOAST_TIMEOUT, showRandomCTAToast } from "./cta-toasts";
 import { haptic } from "@/lib/haptic";
 
 // Separate button states into a memoized component
@@ -60,7 +56,6 @@ export function InvoicePDFDownloadLink({
   isMobile: boolean;
 }) {
   const { inAppInfo } = useDeviceContext();
-  const { markCTAActionTriggered } = useCTAToast();
 
   const [{ loading: pdfLoading, url, error }, updatePdfInstance] = usePDF();
   const [isLoading, setIsLoading] = useState(false);
@@ -116,13 +111,6 @@ export function InvoicePDFDownloadLink({
       if (!isLoading && !error) {
         haptic();
 
-        // track download event
-        umamiTrackEvent("download_invoice", {
-          data: {
-            invoice_template: invoiceData.template,
-          },
-        });
-
         updateAppMetadata((current) => ({
           ...current,
           invoiceDownloadCount: (current?.invoiceDownloadCount ?? 0) + 1,
@@ -130,12 +118,6 @@ export function InvoicePDFDownloadLink({
 
         // close all other toasts (if any)
         toast.dismiss();
-
-        markCTAActionTriggered();
-
-        setTimeout(() => {
-          showRandomCTAToast();
-        }, CTA_TOAST_TIMEOUT);
       }
     },
     [
@@ -147,7 +129,6 @@ export function InvoicePDFDownloadLink({
       error,
       isMobile,
       invoiceData.template,
-      markCTAActionTriggered,
     ],
   );
 
@@ -208,8 +189,7 @@ export function InvoicePDFDownloadLink({
       ErrorGeneratingPdfToast();
       setErrorWhileGeneratingPdfIsShown(true);
 
-      umamiTrackEvent("error_generating_document_link", { data: { error } });
-      Sentry.captureException(error);
+      console.error(error);
     }
   }, [
     error,

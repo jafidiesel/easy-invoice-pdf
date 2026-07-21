@@ -20,8 +20,6 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { isLocalStorageAvailable } from "@/lib/check-local-storage";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-import * as Sentry from "@sentry/nextjs";
 import { DEFAULT_BUYER_DATA } from "@/app/constants";
 
 export const BUYERS_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_BUYERS";
@@ -111,7 +109,7 @@ export function BuyerManagement({
           invalidBuyers,
         );
 
-        Sentry.captureException(
+        console.error(
           new Error(
             `[buyer-management] Invalid buyer data in localStorage: ${rawBuyers.length - validBuyers.length} items dropped`,
           ),
@@ -132,7 +130,7 @@ export function BuyerManagement({
     } catch (error) {
       console.error("Failed to load buyers:", error);
 
-      Sentry.captureException(error);
+      console.error(error);
     }
   }, [invoiceData?.buyer?.id, setSelectedBuyerId]);
 
@@ -174,7 +172,6 @@ export function BuyerManagement({
       );
 
       // analytics track event
-      umamiTrackEvent("add_buyer_success");
     } catch (error) {
       console.error("Failed to add buyer:", error);
 
@@ -185,7 +182,7 @@ export function BuyerManagement({
         position: isMobile ? "top-center" : "bottom-right",
       });
 
-      Sentry.captureException(error);
+      console.error(error);
     }
   };
 
@@ -214,7 +211,6 @@ export function BuyerManagement({
       });
 
       // analytics track event
-      umamiTrackEvent("edit_buyer_success");
     } catch (error) {
       console.error("Failed to edit buyer:", error);
 
@@ -225,7 +221,7 @@ export function BuyerManagement({
         position: isMobile ? "top-center" : "bottom-right",
       });
 
-      Sentry.captureException(error);
+      console.error(error);
     }
   };
 
@@ -259,7 +255,6 @@ export function BuyerManagement({
     }
 
     // analytics track event
-    umamiTrackEvent("change_buyer");
   };
 
   const handleDeleteBuyer = () => {
@@ -290,7 +285,6 @@ export function BuyerManagement({
       });
 
       // analytics track event
-      umamiTrackEvent("delete_buyer_success");
     } catch (error) {
       console.error("Failed to delete buyer:", error);
 
@@ -301,7 +295,7 @@ export function BuyerManagement({
         position: isMobile ? "top-center" : "bottom-right",
       });
 
-      Sentry.captureException(error);
+      console.error(error);
     }
   };
 

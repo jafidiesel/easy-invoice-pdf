@@ -1,7 +1,6 @@
 import { SUPPORTED_LANGUAGES } from "@/app/schema";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { z } from "zod";
 
 /**
@@ -24,8 +23,6 @@ export function handleInvoiceNumberBreakingChange(json: unknown) {
     typeof json.invoiceNumber === "string" &&
     "language" in json
   ) {
-    umamiTrackEvent("breaking_change_detected");
-
     let lang: keyof typeof INVOICE_PDF_TRANSLATIONS;
 
     const invoiceLanguage = z

@@ -1,8 +1,6 @@
 // @vitest-environment happy-dom
 
 import { getInitialInvoiceData } from "@/app/constants";
-import { CTAToastProvider } from "@/app/(app)/contexts/cta-toast-context";
-import { CTA_TOAST_TIMEOUT } from "@/app/(app)/components/cta-toasts";
 import { LOADING_BUTTON_TEXT } from "@/app/(app)/components/invoice-form";
 import { DeviceContextProvider } from "@/contexts/device-context";
 import type { InvoiceData } from "@/app/schema";
@@ -50,14 +48,6 @@ vi.mock("@react-pdf/renderer/lib/react-pdf.browser", async (importOriginal) => {
   };
 });
 
-vi.mock("@/lib/umami-analytics-track-event", () => ({
-  umamiTrackEvent: vi.fn(),
-}));
-
-vi.mock("@sentry/nextjs", () => ({
-  captureException: vi.fn(),
-}));
-
 vi.mock("@/utils/is-telegram-in-app-browser", () => ({
   isTelegramInAppBrowser: vi.fn(() => false),
 }));
@@ -65,15 +55,6 @@ vi.mock("@/utils/is-telegram-in-app-browser", () => ({
 vi.mock("@/app/(app)/utils/get-app-metadata", () => ({
   updateAppMetadata: vi.fn(),
 }));
-
-vi.mock("@/app/(app)/components/cta-toasts", async () => {
-  const actual = await vi.importActual("@/app/(app)/components/cta-toasts");
-
-  return {
-    ...(actual as object),
-    showRandomCTAToast: vi.fn(),
-  };
-});
 
 vi.mock("@/lib/haptic", () => ({
   haptic: vi.fn(),
@@ -92,11 +73,8 @@ vi.mock("sonner", () => ({
 }));
 
 import { InvoicePDFDownloadLink } from "../invoice-pdf-download-link";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-import * as Sentry from "@sentry/nextjs";
 import { isTelegramInAppBrowser } from "@/utils/is-telegram-in-app-browser";
 import { updateAppMetadata } from "@/app/(app)/utils/get-app-metadata";
-import { showRandomCTAToast } from "@/app/(app)/components/cta-toasts";
 import { haptic } from "@/lib/haptic";
 import { ErrorGeneratingPdfToast } from "@/components/ui/toasts/error-generating-pdf-toast";
 import { toast } from "sonner";
@@ -126,17 +104,13 @@ function renderInvoicePDFDownloadLink({
         isMobile={isMobile}
         inAppInfo={inAppInfo}
       >
-        <CTAToastProvider>
-          <InvoicePDFDownloadLink
-            invoiceData={invoiceData}
-            errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
-            setErrorWhileGeneratingPdfIsShown={
-              setErrorWhileGeneratingPdfIsShown
-            }
-            qrCodeDataUrl={qrCodeDataUrl}
-            isMobile={isMobile}
-          />
-        </CTAToastProvider>
+        <InvoicePDFDownloadLink
+          invoiceData={invoiceData}
+          errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
+          setErrorWhileGeneratingPdfIsShown={setErrorWhileGeneratingPdfIsShown}
+          qrCodeDataUrl={qrCodeDataUrl}
+          isMobile={isMobile}
+        />
       </DeviceContextProvider>
     </TooltipProvider>,
   );
@@ -202,7 +176,7 @@ describe("InvoicePDFDownloadLink", () => {
     expect(link).toHaveAttribute("download", "invoice-EN-01-2025.pdf");
   });
 
-  it("should track download_invoice on successful click", async () => {
+  it("should update download metadata on successful click", async () => {
     vi.useFakeTimers();
 
     renderInvoicePDFDownloadLink();
@@ -210,17 +184,8 @@ describe("InvoicePDFDownloadLink", () => {
     fireEvent.click(getDownloadLink());
 
     expect(haptic).toHaveBeenCalledTimes(1);
-    expect(umamiTrackEvent).toHaveBeenCalledWith("download_invoice", {
-      data: {
-        invoice_template: "default",
-      },
-    });
     expect(updateAppMetadata).toHaveBeenCalledTimes(1);
     expect(toast.dismiss).toHaveBeenCalledTimes(1);
-
-    await vi.advanceTimersByTimeAsync(CTA_TOAST_TIMEOUT);
-
-    expect(showRandomCTAToast).toHaveBeenCalledTimes(1);
   });
 
   it("should show error toast when url is missing on click", async () => {
@@ -242,7 +207,6 @@ describe("InvoicePDFDownloadLink", () => {
         id: "file-not-available-error-toast",
       }),
     );
-    expect(umamiTrackEvent).not.toHaveBeenCalled();
   });
 
   it("should block download inside in-app browser", async () => {
@@ -260,7 +224,6 @@ describe("InvoicePDFDownloadLink", () => {
         id: "downloads-blocked-inside-app-toast",
       }),
     );
-    expect(umamiTrackEvent).not.toHaveBeenCalled();
   });
 
   it("should block download inside Telegram preview browser", async () => {
@@ -278,7 +241,6 @@ describe("InvoicePDFDownloadLink", () => {
         id: "downloads-blocked-inside-telegram-toast",
       }),
     );
-    expect(umamiTrackEvent).not.toHaveBeenCalled();
   });
 
   it("should show in-app browser info toast on mount", () => {
@@ -311,11 +273,6 @@ describe("InvoicePDFDownloadLink", () => {
 
     expect(ErrorGeneratingPdfToast).toHaveBeenCalledTimes(1);
     expect(setErrorWhileGeneratingPdfIsShown).toHaveBeenCalledWith(true);
-    expect(umamiTrackEvent).toHaveBeenCalledWith(
-      "error_generating_document_link",
-      { data: { error: pdfError } },
-    );
-    expect(Sentry.captureException).toHaveBeenCalledWith(pdfError);
   });
 
   it("should show responsibility tooltip on hover", async () => {

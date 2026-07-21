@@ -1,12 +1,7 @@
 "use client";
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  DISCORD_COMMUNITY_URL,
-  HOW_IT_WORKS_VIDEOS,
-  REDDIT_COMMUNITY_URL,
-} from "@/config";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { HOW_IT_WORKS_VIDEOS } from "@/config";
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -84,7 +79,6 @@ export function HowItWorksVideos({
   function handleTabChange(value: string) {
     const videoId = value as HowItWorksVideoId;
     setActiveVideoId(videoId);
-    umamiTrackEvent(`how-it-works-video-tab-${value}`);
     onVideoChange?.(videoId);
   }
 
@@ -145,32 +139,6 @@ export function HowItWorksVideos({
             data-testid="how-it-works-video"
           />
         ) : null}
-      </div>
-
-      <div className="shrink-0 border-t border-slate-200 px-4 py-3 text-center text-xs leading-relaxed text-slate-600 sm:px-6 sm:py-4 sm:text-left sm:text-sm">
-        Questions or feedback? Join our{" "}
-        <a
-          href={DISCORD_COMMUNITY_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-semibold text-slate-800 underline decoration-slate-400 underline-offset-2 transition-colors hover:text-slate-950 hover:decoration-slate-500"
-          data-testid="how-it-works-discord"
-          onClick={() => umamiTrackEvent("how-it-works-discord-click")}
-        >
-          Discord
-        </a>{" "}
-        or{" "}
-        <a
-          href={REDDIT_COMMUNITY_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-semibold text-slate-800 underline decoration-slate-400 underline-offset-2 transition-colors hover:text-slate-950 hover:decoration-slate-500"
-          data-testid="how-it-works-reddit"
-          onClick={() => umamiTrackEvent("how-it-works-reddit-click")}
-        >
-          Reddit
-        </a>{" "}
-        community.
       </div>
     </div>
   );

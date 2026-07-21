@@ -3,13 +3,6 @@ import { handleInvoiceNumberBreakingChange } from "../invoice-number-breaking-ch
 import { SUPPORTED_LANGUAGES, type InvoiceData } from "@/app/schema";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 
-// Mock the umami tracking function
-vi.mock("@/lib/umami-analytics-track-event", () => ({
-  umamiTrackEvent: vi.fn(),
-}));
-
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-
 describe("handleInvoiceNumberBreakingChange", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -36,10 +29,6 @@ describe("handleInvoiceNumberBreakingChange", () => {
 
       // Should not contain the old invoiceNumber field
       expect(result).not.toHaveProperty("invoiceNumber");
-
-      // Should track the breaking change event
-      expect(umamiTrackEvent).toHaveBeenCalledWith("breaking_change_detected");
-      expect(umamiTrackEvent).toHaveBeenCalledTimes(1);
     });
 
     it("should transform invoiceNumber with Polish language", () => {
@@ -57,8 +46,6 @@ describe("handleInvoiceNumberBreakingChange", () => {
           value: "FAKT-001",
         },
       });
-
-      expect(umamiTrackEvent).toHaveBeenCalledWith("breaking_change_detected");
     });
 
     it("should transform invoiceNumber with German language", () => {
@@ -76,8 +63,6 @@ describe("handleInvoiceNumberBreakingChange", () => {
           value: "RG-2024-001",
         },
       });
-
-      expect(umamiTrackEvent).toHaveBeenCalledWith("breaking_change_detected");
     });
 
     it("should preserve all other fields when transforming", () => {
@@ -136,9 +121,6 @@ describe("handleInvoiceNumberBreakingChange", () => {
         expect.any(Object),
       );
 
-      // Should still track the breaking change event
-      expect(umamiTrackEvent).toHaveBeenCalledWith("breaking_change_detected");
-
       consoleSpy.mockRestore();
     });
 
@@ -164,7 +146,6 @@ describe("handleInvoiceNumberBreakingChange", () => {
       });
 
       expect(consoleSpy).toHaveBeenCalled();
-      expect(umamiTrackEvent).toHaveBeenCalledWith("breaking_change_detected");
 
       consoleSpy.mockRestore();
     });
@@ -181,7 +162,6 @@ describe("handleInvoiceNumberBreakingChange", () => {
       const result = handleInvoiceNumberBreakingChange(input);
 
       expect(result).toBe(input);
-      expect(umamiTrackEvent).not.toHaveBeenCalled();
     });
 
     it("should return unchanged when language field is missing", () => {
@@ -193,7 +173,6 @@ describe("handleInvoiceNumberBreakingChange", () => {
       const result = handleInvoiceNumberBreakingChange(input);
 
       expect(result).toBe(input);
-      expect(umamiTrackEvent).not.toHaveBeenCalled();
     });
 
     it("should return unchanged when invoiceNumber is not a string", () => {
@@ -205,7 +184,6 @@ describe("handleInvoiceNumberBreakingChange", () => {
       const result = handleInvoiceNumberBreakingChange(input);
 
       expect(result).toBe(input);
-      expect(umamiTrackEvent).not.toHaveBeenCalled();
     });
 
     it("should transform even when invoiceNumber is empty string", () => {
@@ -223,22 +201,18 @@ describe("handleInvoiceNumberBreakingChange", () => {
           value: "",
         },
       });
-
-      expect(umamiTrackEvent).toHaveBeenCalledWith("breaking_change_detected");
     });
 
     it("should return unchanged when input is null", () => {
       const result = handleInvoiceNumberBreakingChange(null);
 
       expect(result).toBe(null);
-      expect(umamiTrackEvent).not.toHaveBeenCalled();
     });
 
     it("should return unchanged when input is undefined", () => {
       const result = handleInvoiceNumberBreakingChange(undefined);
 
       expect(result).toBe(undefined);
-      expect(umamiTrackEvent).not.toHaveBeenCalled();
     });
 
     it("should return unchanged when input is not an object", () => {
@@ -251,8 +225,6 @@ describe("handleInvoiceNumberBreakingChange", () => {
       expect(handleInvoiceNumberBreakingChange(booleanInput)).toBe(
         booleanInput,
       );
-
-      expect(umamiTrackEvent).not.toHaveBeenCalled();
     });
 
     it("should return unchanged when input is an array", () => {
@@ -260,7 +232,6 @@ describe("handleInvoiceNumberBreakingChange", () => {
       const result = handleInvoiceNumberBreakingChange(arrayInput);
 
       expect(result).toBe(arrayInput);
-      expect(umamiTrackEvent).not.toHaveBeenCalled();
     });
   });
 
@@ -285,8 +256,6 @@ describe("handleInvoiceNumberBreakingChange", () => {
           value: "OLD-001",
         },
       });
-
-      expect(umamiTrackEvent).toHaveBeenCalledWith("breaking_change_detected");
     });
 
     it("should handle all supported languages correctly", () => {
@@ -306,9 +275,6 @@ describe("handleInvoiceNumberBreakingChange", () => {
           },
         });
       });
-
-      // Should track one event per language
-      expect(umamiTrackEvent).toHaveBeenCalledTimes(SUPPORTED_LANGUAGES.length);
     });
 
     it("should handle special characters in invoiceNumber", () => {

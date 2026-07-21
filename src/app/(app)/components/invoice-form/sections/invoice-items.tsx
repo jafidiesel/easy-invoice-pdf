@@ -21,7 +21,6 @@ import { InputHelperMessage } from "@/components/ui/input-helper-message";
 import { MoneyInput, ReadOnlyMoneyInput } from "@/components/ui/money-input";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { Plus, Trash2 } from "lucide-react";
 import { Legend } from "@/components/legend";
 import {
@@ -802,8 +801,6 @@ export const InvoiceItems = memo(function InvoiceItems({
                 typeOfGTU: "",
                 typeOfGTUFieldIsVisible: true,
               });
-
-              umamiTrackEvent("add_invoice_item");
             }}
             variant="default"
             className="w-full gap-2"

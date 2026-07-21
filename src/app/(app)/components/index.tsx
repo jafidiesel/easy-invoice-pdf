@@ -10,7 +10,6 @@ import dayjs from "dayjs";
 import { AlertCircleIcon, FileTextIcon, PencilIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 
-import Link from "next/link";
 import type { Dispatch, SetStateAction } from "react";
 import { getAppMetadata, updateAppMetadata } from "../utils/get-app-metadata";
 import { InvoiceForm } from "./invoice-form";
@@ -272,38 +271,6 @@ export function InvoiceClientPage({
               {invoiceLastUpdatedAtFormatted}
             </div>
           )}
-
-          <div
-            className="mt-5 flex flex-wrap justify-center gap-1 text-xs text-zinc-900"
-            data-testid="mobile-terms-of-service-link"
-          >
-            By using this tool, you agree to the{" "}
-            <Link href="/tos" className="underline hover:text-black">
-              Terms of Service
-            </Link>
-          </div>
-          {/* Founders info section (Mobile version) */}
-          <div className="mt-5 flex w-full justify-center">
-            <div className="flex items-center gap-1.5 text-xs text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2">
-              <a href={"/founder"}>
-                <img
-                  src="https://ik.imagekit.io/fl2lbswwo/avatar.jpeg?updatedAt=1757456439459"
-                  alt="Vlad Sazonau"
-                  className="size-6 rounded-full"
-                  height="24"
-                  width="24"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </a>
-              <span>
-                Made by{" "}
-                <a href={"/founder"} className="underline hover:text-black">
-                  Vlad Sazonau
-                </a>
-              </span>
-            </div>
-          </div>
         </div>
       ) : (
         // Desktop View
@@ -316,27 +283,6 @@ export function InvoiceClientPage({
                 handleInvoiceDataChange={handleInvoiceDataChange}
                 setInvoiceFormHasErrors={setInvoiceFormHasErrors}
               />
-            </div>
-
-            {/* Founders info section (Desktop version) */}
-            <div className="mt-1 flex items-center gap-1.5 text-xs text-zinc-800 duration-500 animate-in fade-in slide-in-from-bottom-2">
-              <a href={"/founder"}>
-                <img
-                  src="https://ik.imagekit.io/fl2lbswwo/avatar.jpeg?updatedAt=1757456439459"
-                  alt="Vlad Sazonau"
-                  className="size-6 rounded-full"
-                  height="24"
-                  width="24"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </a>
-              <span>
-                Made by{" "}
-                <a href={"/founder"} className="underline hover:text-black">
-                  Vlad Sazonau
-                </a>
-              </span>
             </div>
           </div>
           {/* Invoice preview section i.e. right column (Desktop version) */}
@@ -355,15 +301,6 @@ export function InvoiceClientPage({
               isMobile={false}
               qrCodeDataUrl={qrCodeDataUrl}
             />
-            <div
-              className="absolute -bottom-6 right-0 text-right text-xs text-zinc-800"
-              data-testid="desktop-terms-of-service-link"
-            >
-              By using this tool, you agree to the{" "}
-              <Link href="/tos" className="underline hover:text-black">
-                Terms of Service
-              </Link>
-            </div>
           </div>
         </>
       )}

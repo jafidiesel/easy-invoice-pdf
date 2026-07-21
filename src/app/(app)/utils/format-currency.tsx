@@ -1,5 +1,4 @@
 import type { SupportedCurrencies, SupportedLanguages } from "@/app/schema";
-import * as Sentry from "@sentry/nextjs";
 
 export function formatCurrency({
   amount,
@@ -22,7 +21,7 @@ export function formatCurrency({
 
     return value;
   } catch (error) {
-    Sentry.captureException(error);
+    console.error(error);
 
     return "0.00";
   }

@@ -16,10 +16,6 @@ import dayjs from "dayjs";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 import { INITIAL_INVOICE_DATA } from "../src/app/constants";
 import {
-  DISCORD_COMMUNITY_URL,
-  GITHUB_URL,
-  REDDIT_COMMUNITY_URL,
-  STATIC_ASSETS_URL,
   VIDEO_DEMO_YOUTUBE_URL,
   YOUTUBE_VIDEO_HOW_TO_ADD_SELLER,
 } from "@/config";
@@ -30,73 +26,12 @@ test.describe("Invoice Generator Page", () => {
     await expect(page).toHaveURL("/?template=default");
   });
 
-  test("returns permanent redirect from /:locale/app to /", async ({
-    request,
-  }) => {
-    const response = await request.get("/en/app", {
-      maxRedirects: 0, // IMPORTANT
-    });
-
-    // this is a Next.js permanent redirect defined in next.config.mjs
-    expect(response.status()).toBe(308); // Next.js permanent redirect
-    expect(response.statusText()).toBe("Permanent Redirect");
-    // we expect the redirect to the root URL
-    expect(response.headers().location).toBe("/");
-  });
-
-  test("displays correct OG meta tags for default template", async ({
-    page,
-  }) => {
-    await expect(page).toHaveURL("/?template=default");
-
-    const templateCombobox = page.getByRole("combobox", {
-      name: "Invoice Template",
-    });
-    await expect(templateCombobox).toHaveValue("default");
-
-    // Check that OG image changed to Stripe template
-    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
-      "content",
-      `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
-    );
-
-    // Check other meta tags for Stripe template
-    await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
-      "content",
-      "Free Invoice Generator - Create PDF Invoices Online",
-    );
-    await expect(
-      page.locator('meta[property="og:description"]'),
-    ).toHaveAttribute(
-      "content",
-      "Create professional PDF invoices online for free. Customize invoice templates, add your logo, download instantly, and send invoices without signup.",
-    );
-    await expect(page.locator('meta[property="og:site_name"]')).toHaveAttribute(
-      "content",
-      "EasyInvoicePDF.com | Free Invoice PDF Generator",
-    );
-
-    // Verify OG image dimensions
-    await expect(
-      page.locator('meta[property="og:image:width"]'),
-    ).toHaveAttribute("content", "1200");
-    await expect(
-      page.locator('meta[property="og:image:height"]'),
-    ).toHaveAttribute("content", "630");
-    await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute(
-      "content",
-      "Default Invoice Template - EasyInvoicePDF.com",
-    );
-  });
-
   test("displays correct buttons and links in header", async ({ page }) => {
     // Check URL is correct
     await expect(page).toHaveURL("/?template=default");
 
     // Check title and branding
-    await expect(page).toHaveTitle(
-      "Free Invoice Generator - Create PDF Invoices Online",
-    );
+    await expect(page).toHaveTitle("Create Invoice — EasyInvoicePDF");
 
     const header = page.getByTestId("header");
     await expect(header).toBeVisible();
@@ -116,17 +51,6 @@ test.describe("Invoice Generator Page", () => {
     await expect(
       page.getByRole("link", { name: "Download PDF in English" }),
     ).toBeVisible();
-
-    const shareFeedbackLink = header.getByRole("link", {
-      name: "Share your feedback",
-    });
-    await expect(shareFeedbackLink).toBeVisible();
-
-    await expect(shareFeedbackLink).toHaveAttribute(
-      "href",
-      DISCORD_COMMUNITY_URL,
-    );
-    await expect(shareFeedbackLink).toHaveAttribute("target", "_blank");
 
     const howItWorksButton = header.getByRole("button", {
       name: "How it works",
@@ -173,29 +97,12 @@ test.describe("Invoice Generator Page", () => {
       dialog.getByRole("heading", { name: "How to add a seller" }),
     ).toBeVisible();
 
-    const discordLink = dialog.getByTestId("how-it-works-discord");
-    const redditLink = dialog.getByTestId("how-it-works-reddit");
-    await expect(discordLink).toBeVisible();
-    await expect(discordLink).toHaveAttribute("href", DISCORD_COMMUNITY_URL);
-    await expect(redditLink).toBeVisible();
-    await expect(redditLink).toHaveAttribute("href", REDDIT_COMMUNITY_URL);
-
     await dialog.getByRole("button", { name: "Close" }).click();
     await expect(dialog).toBeHidden();
 
     await expect(
       dialog.getByRole("heading", { name: "How EasyInvoicePDF Works" }),
     ).toBeHidden();
-
-    // Verify GitHub Star CTA button is visible
-    const githubStarCtaButton = page.getByRole("link", {
-      name: "Star project on GitHub",
-      exact: true,
-    });
-
-    await expect(githubStarCtaButton).toBeVisible();
-    await expect(githubStarCtaButton).toHaveAttribute("href", GITHUB_URL);
-    await expect(githubStarCtaButton).toHaveAttribute("target", "_blank");
 
     // Verify buttons are enabled
     await expect(
@@ -214,36 +121,12 @@ test.describe("Invoice Generator Page", () => {
     await expect(page.getByRole("tab", { name: "Edit Invoice" })).toBeVisible();
     await expect(page.getByRole("tab", { name: "Preview PDF" })).toBeVisible();
 
-    const termsOfServiceMobile = page.getByTestId(
-      "mobile-terms-of-service-link",
-    );
-    const termsOfServiceLinkMobile = termsOfServiceMobile.getByRole("link");
-
-    // Check that Terms of Service are displayed
-    await expect(termsOfServiceMobile).toBeVisible();
-    await expect(termsOfServiceMobile).toHaveText(
-      "By using this tool, you agree to the Terms of Service",
-    );
-    await expect(termsOfServiceLinkMobile).toHaveAttribute("href", "/tos");
-
     // Test desktop view
     await page.setViewportSize({ width: 1280, height: 800 });
 
     // check that tabs are not visible in desktop view
     await expect(page.getByRole("tab", { name: "Edit Invoice" })).toBeHidden();
     await expect(page.getByRole("tab", { name: "Preview PDF" })).toBeHidden();
-
-    const termsOfServiceDesktop = page.getByTestId(
-      "desktop-terms-of-service-link",
-    );
-    const termsOfServiceLinkDesktop = termsOfServiceDesktop.getByRole("link");
-
-    // Check that Terms of Service are displayed
-    await expect(termsOfServiceDesktop).toBeVisible();
-    await expect(termsOfServiceDesktop).toHaveText(
-      "By using this tool, you agree to the Terms of Service",
-    );
-    await expect(termsOfServiceLinkDesktop).toHaveAttribute("href", "/tos");
   });
 
   test("displays initial form state correctly", async ({ page }) => {

@@ -22,7 +22,6 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as Sentry from "@sentry/nextjs";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -202,7 +201,7 @@ export function SellerDialog({
         } else {
           hadInvalidSellers = true;
 
-          Sentry.captureException(
+          console.error(
             new Error(
               `[seller-dialog] Invalid seller data in localStorage: ${rawSellers.length - validSellers.length} items dropped`,
             ),
@@ -269,7 +268,7 @@ export function SellerDialog({
         richColors: true,
       });
 
-      Sentry.captureException(error);
+      console.error(error);
     }
   }
 

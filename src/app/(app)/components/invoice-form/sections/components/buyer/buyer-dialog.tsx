@@ -27,7 +27,6 @@ import { toast } from "sonner";
 import { ConfirmDiscardDialog } from "../confirm-discard-dialog";
 import { BUYERS_LOCAL_STORAGE_KEY } from "./buyer-management";
 import { useState, useEffect } from "react";
-import * as Sentry from "@sentry/nextjs";
 import { InputHelperMessage } from "../../../../../../../components/ui/input-helper-message";
 import { useConfirmDiscard } from "@/app/(app)/components/invoice-form/sections/hooks/use-confirm-discard";
 
@@ -206,7 +205,7 @@ export function BuyerDialog({
             result.error,
           );
 
-          Sentry.captureException(
+          console.error(
             new Error(
               `[buyer-dialog] Invalid buyer data in localStorage: ${rawBuyers.length - validBuyers.length} items dropped`,
             ),
@@ -263,7 +262,7 @@ export function BuyerDialog({
         richColors: true,
       });
 
-      Sentry.captureException(error);
+      console.error(error);
     }
   }
 

@@ -25,14 +25,12 @@ import { ReadOnlyMoneyInput } from "@/components/ui/money-input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import type { NonReadonly, Prettify } from "@/types";
 import { calculateItemTotals } from "./utils/calculate-item-totals";
 import { formErrorsToToast } from "./utils/form-errors-to-toast";
 import { hasAnyItemTotalsChanged } from "./utils/has-item-totals-changed";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as Sentry from "@sentry/nextjs";
 import dayjs from "dayjs";
 import {
   memo,
@@ -215,7 +213,7 @@ export const InvoiceForm = memo(function InvoiceForm({
       } catch (error) {
         console.error("Error saving to local storage:", error);
 
-        Sentry.captureException(error);
+        console.error(error);
       }
     },
     // debounce delay in ms
@@ -261,7 +259,6 @@ export const InvoiceForm = memo(function InvoiceForm({
       });
 
       // analytics track event
-      umamiTrackEvent("remove_invoice_item");
     },
     [invoiceItems, setValue, isMobile],
   );
@@ -310,7 +307,7 @@ export const InvoiceForm = memo(function InvoiceForm({
     } catch (error) {
       console.error("Error loading accordion state:", error);
 
-      Sentry.captureException(error);
+      console.error(error);
     }
 
     // Default to all sections open if no valid state found
@@ -339,7 +336,7 @@ export const InvoiceForm = memo(function InvoiceForm({
     } catch (error) {
       console.error("Error saving accordion state:", error);
 
-      Sentry.captureException(error);
+      console.error(error);
     }
   };
 

@@ -48,7 +48,7 @@ const DEFAULT_TEMPLATE = SUPPORTED_TEMPLATES[0];
  *
  * Used as default **invoice number** when creating a new invoice
  */
-export function getInvoiceDefaultNumberValue() {
+function getInvoiceDefaultNumberValue() {
   return `1/${dayjs().format("MM-YYYY")}` as const;
 }
 
@@ -200,4 +200,60 @@ export function getInitialInvoiceData() {
       value: getInvoiceDefaultNumberValue(),
     },
   } satisfies InvoiceData;
+}
+
+/**
+ * Preloaded seller/buyer/price values sourced from server env vars (see src/env.ts).
+ * Every field is optional — only the ones actually set in .env are applied.
+ */
+export interface InvoiceEnvDefaults {
+  seller?: Partial<
+    Pick<
+      SellerData,
+      "name" | "address" | "vatNo" | "email" | "accountNumber" | "swiftBic"
+    >
+  >;
+  buyer?: Partial<Pick<BuyerData, "name" | "address" | "vatNo" | "email">>;
+  /** Default net price applied to the first invoice item */
+  itemNetPrice?: number;
+}
+
+/**
+ * Seeds a brand-new invoice with values preloaded from .env (SELLER_*, BUYER_*,
+ * INVOICE_NET_PRICE). Only used when there is no existing invoice in localStorage,
+ * so it never overwrites data the user has already entered.
+ */
+export function applyInvoiceEnvDefaults(
+  data: InvoiceData,
+  envDefaults: InvoiceEnvDefaults | undefined,
+): InvoiceData {
+  if (!envDefaults) {
+    return data;
+  }
+
+  const { seller, buyer, itemNetPrice } = envDefaults;
+
+  const [firstItem, ...restItems] = data.items;
+
+  const items =
+    itemNetPrice !== undefined && firstItem
+      ? [
+          {
+            ...firstItem,
+            netPrice: itemNetPrice,
+            // amount defaults to 1 and vat defaults to "NP" (no VAT), so with those
+            // defaults netAmount/preTaxAmount are simply the net price
+            netAmount: itemNetPrice * firstItem.amount,
+            preTaxAmount: itemNetPrice * firstItem.amount,
+          },
+          ...restItems,
+        ]
+      : data.items;
+
+  return {
+    ...data,
+    seller: { ...data.seller, ...seller },
+    buyer: { ...data.buyer, ...buyer },
+    items,
+  };
 }

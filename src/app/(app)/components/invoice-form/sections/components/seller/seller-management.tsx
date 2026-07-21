@@ -26,8 +26,6 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { isLocalStorageAvailable } from "@/lib/check-local-storage";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-import * as Sentry from "@sentry/nextjs";
 import { DEFAULT_SELLER_DATA } from "@/app/constants";
 import { SellerDialog } from "@/app/(app)/components/invoice-form/sections/components/seller/seller-dialog";
 
@@ -120,7 +118,7 @@ export function SellerManagement({
           invalidSellers,
         );
 
-        Sentry.captureException(
+        console.error(
           new Error(
             `[seller-management] Invalid seller data in localStorage: ${rawSellers.length - validSellers.length} items dropped`,
           ),
@@ -141,7 +139,7 @@ export function SellerManagement({
     } catch (error) {
       console.error("Failed to load sellers:", error);
 
-      Sentry.captureException(error);
+      console.error(error);
     }
   }, [invoiceData?.seller?.id, setSelectedSellerId]);
 
@@ -188,7 +186,6 @@ export function SellerManagement({
       );
 
       // analytics track event
-      umamiTrackEvent("add_seller_success");
     } catch (error) {
       console.error("Failed to add seller:", error);
 
@@ -199,7 +196,7 @@ export function SellerManagement({
         position: isMobile ? "top-center" : "bottom-right",
       });
 
-      Sentry.captureException(error);
+      console.error(error);
     }
   };
 
@@ -228,7 +225,6 @@ export function SellerManagement({
       });
 
       // analytics track event
-      umamiTrackEvent("edit_seller_success");
     } catch (error) {
       console.error("Failed to edit seller:", error);
 
@@ -239,7 +235,7 @@ export function SellerManagement({
         position: isMobile ? "top-center" : "bottom-right",
       });
 
-      Sentry.captureException(error);
+      console.error(error);
     }
   };
 
@@ -273,7 +269,6 @@ export function SellerManagement({
     }
 
     // analytics track event
-    umamiTrackEvent("change_seller");
   };
 
   const handleDeleteSeller = () => {
@@ -304,7 +299,6 @@ export function SellerManagement({
       });
 
       // analytics track event
-      umamiTrackEvent("delete_seller_success");
     } catch (error) {
       console.error("Failed to delete seller:", error);
 
@@ -315,7 +309,7 @@ export function SellerManagement({
         position: isMobile ? "top-center" : "bottom-right",
       });
 
-      Sentry.captureException(error);
+      console.error(error);
     }
   };
 

@@ -1,6 +1,5 @@
 "use client";
 
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { pdf } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
@@ -66,7 +65,6 @@ export function InvoicePDFDownloadMultipleLanguages({
       const pdfBlobs = await Promise.all(pdfPromises);
 
       // Track analytics
-      umamiTrackEvent("generate_multiple_pdfs_zip");
 
       const invoiceNumber = `${invoiceData?.invoiceNumberObject?.label} ${invoiceData?.invoiceNumberObject?.value}`;
 

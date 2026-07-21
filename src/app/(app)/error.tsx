@@ -15,8 +15,6 @@ import {
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { getInitialInvoiceData } from "../constants";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-import * as Sentry from "@sentry/nextjs";
 import { ErrorMessage } from "@/components/etc/error-message";
 import {
   METADATA_LOCAL_STORAGE_KEY,
@@ -33,7 +31,7 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    Sentry.captureException(error);
+    console.error(error);
 
     toast.error(
       "Something went wrong! Please try to refresh the page or fill a bug report.",
@@ -70,8 +68,6 @@ export default function Error({
             // Attempt to recover by trying to re-render the segment
             () => {
               reset();
-
-              umamiTrackEvent("error_button_try_again_clicked");
             }
           }
           variant="outline"
@@ -112,8 +108,6 @@ export default function Error({
                       closeButton: true,
                       richColors: true,
                     });
-
-                    umamiTrackEvent("error_button_start_from_scratch_clicked");
                   } catch (error) {
                     console.error(error);
 
@@ -123,7 +117,7 @@ export default function Error({
                       richColors: true,
                     });
 
-                    Sentry.captureException(error);
+                    console.error(error);
                   }
                 }}
               >

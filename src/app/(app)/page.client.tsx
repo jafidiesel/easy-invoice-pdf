@@ -1,6 +1,10 @@
 "use client";
 
-import { getInitialInvoiceData } from "@/app/constants";
+import {
+  applyInvoiceEnvDefaults,
+  getInitialInvoiceData,
+  type InvoiceEnvDefaults,
+} from "@/app/constants";
 import {
   invoiceSchema,
   METADATA_LOCAL_STORAGE_KEY,
@@ -19,15 +23,12 @@ import {
   updateAppMetadata,
 } from "@/app/(app)/utils/get-app-metadata";
 import { Footer } from "@/app/(components)/footer";
-import { GitHubStarCTA } from "@/components/github-star-cta";
 import { Button } from "@/components/ui/button";
 import { haptic } from "@/lib/haptic";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import {
   compressInvoiceData,
   decompressInvoiceData,
 } from "@/utils/url-compression";
-import * as Sentry from "@sentry/nextjs";
 import {
   compressToEncodedURIComponent,
   decompressFromEncodedURIComponent,
@@ -37,13 +38,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { InvoiceClientPage } from "./components";
-import { ChangelogUpdatePopup } from "./components/changelog-update-popup";
-import { HowItWorksVideoDialog } from "./components/how-it-works-video-dialog";
-import { showRandomCTAToast } from "./components/cta-toasts";
-import { useCTAToast } from "./contexts/cta-toast-context";
-import { useChangelogUpdatePopup } from "./hooks/use-changelog-update-popup";
-import { useShowRandomCTAToastOnIdle } from "./hooks/use-show-random-cta-toast";
-import type { ChangelogSummary } from "@/app/changelog/utils";
 import { generateQrCodeDataUrl } from "./utils/generate-qr-code-data-url";
 import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaking-change";
 
@@ -60,22 +54,17 @@ import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaki
  * - Invoice data state management and updates
  * - PDF generation and download functionality
  * - Share invoice functionality with URL generation
- * - CTA toast notifications for user engagement
  * - Error handling and user feedback
  *
  * @returns The rendered invoice application page with form, preview, and controls
  */
 export function AppPageClient({
-  githubStarsCount,
-  latestChangelog,
+  envDefaults,
 }: {
-  githubStarsCount: number;
-  latestChangelog: ChangelogSummary | null;
+  envDefaults?: InvoiceEnvDefaults;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-
-  const { markCTAActionTriggered, incrementInteractionCount } = useCTAToast();
 
   const urlTemplateSearchParam = searchParams.get("template");
 
@@ -113,19 +102,6 @@ export function AppPageClient({
 
   const isViewingSharedInvoice =
     searchParams.get("data") !== null && !isInvoiceUrlCorrupted;
-
-  const {
-    isOpen: isChangelogPopupOpen,
-    dismiss: dismissChangelogPopup,
-    variant: changelogPopupVariant,
-    latestChangelog: changelogForPopup,
-  } = useChangelogUpdatePopup({
-    latestChangelog,
-    isViewingSharedInvoice,
-    isMobile,
-  });
-
-  const [isHowItWorksDialogOpen, setIsHowItWorksDialogOpen] = useState(false);
 
   const [invoiceFormHasErrors, setInvoiceFormHasErrors] = useState(false);
 
@@ -170,12 +146,6 @@ export function AppPageClient({
     };
   }, [invoiceDataState?.qrCodeData, invoiceDataState?.qrCodeIsVisible]);
 
-  // Only show CTA toast on idle in non-CI environments
-  if (!process.env.CI) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    useShowRandomCTAToastOnIdle();
-  }
-
   // Helper function to load from localStorage
   const loadFromLocalStorage = useCallback(() => {
     try {
@@ -210,19 +180,23 @@ export function AppPageClient({
         if (templateValidation.success) {
           // if no data in local storage and template is in url, set initial data with template from url
           setInvoiceDataState({
-            ...getInitialInvoiceData(),
+            ...applyInvoiceEnvDefaults(getInitialInvoiceData(), envDefaults),
             template: templateValidation.data,
           });
         } else {
           // if no data in local storage, set initial data
-          setInvoiceDataState(getInitialInvoiceData());
+          setInvoiceDataState(
+            applyInvoiceEnvDefaults(getInitialInvoiceData(), envDefaults),
+          );
         }
       }
     } catch (error) {
       console.error("Failed to load saved invoice data:", error);
 
       // fallback to initial data on error
-      setInvoiceDataState(getInitialInvoiceData());
+      setInvoiceDataState(
+        applyInvoiceEnvDefaults(getInitialInvoiceData(), envDefaults),
+      );
 
       toast.error(
         "Unable to load your saved invoice data. For your convenience, we've reset the form to default values. Please try creating a new invoice.",
@@ -234,9 +208,9 @@ export function AppPageClient({
         },
       );
 
-      Sentry.captureException(error);
+      console.error(error);
     }
-  }, [templateValidation.data, templateValidation.success]);
+  }, [templateValidation.data, templateValidation.success, envDefaults]);
 
   useEffect(() => {
     // Scroll to top of the page on first render for better UX
@@ -342,7 +316,7 @@ export function AppPageClient({
           closeButton: true,
         });
 
-        Sentry.captureException(error);
+        console.error(error);
       }
     } else {
       console.log(
@@ -495,9 +469,6 @@ export function AppPageClient({
     setInvoiceDataState(updatedData);
     checkForInvoiceChanges(updatedData);
 
-    // this is used to show CTA toast
-    incrementInteractionCount();
-
     const currentTemplate = searchParams.get("template");
 
     // update the url with the new template
@@ -615,8 +586,6 @@ export function AppPageClient({
                 url: newGeneratedLinkFullUrl,
               })
               .then(() => {
-                umamiTrackEvent("share_invoice_link_mobile");
-
                 updateAppMetadata((current) => ({
                   ...current,
                   invoiceSharedCount: (current?.invoiceSharedCount ?? 0) + 1,
@@ -626,11 +595,6 @@ export function AppPageClient({
                 setTimeout(() => {
                   toast.dismiss();
                 }, 1_500);
-
-                // show CTA toast after x seconds
-                setTimeout(() => {
-                  showRandomCTAToast();
-                }, 2_500);
               })
               .catch((err) => {
                 console.error(
@@ -650,7 +614,7 @@ export function AppPageClient({
                     duration: 5_000,
                   });
 
-                  Sentry.captureException(err);
+                  console.error(err);
                 }
               });
           } catch (shareError) {
@@ -679,31 +643,22 @@ export function AppPageClient({
                 duration: 5_000,
               });
 
-              umamiTrackEvent("share_invoice_link");
-
               updateAppMetadata((current) => ({
                 ...current,
                 invoiceSharedCount: (current?.invoiceSharedCount ?? 0) + 1,
               }));
-
-              // show CTA toast after x seconds (after invoice link notification is shown)
-              setTimeout(() => {
-                showRandomCTAToast();
-              }, 5_500);
             })
             .catch((err) => {
-              Sentry.captureException(err);
+              console.error(err);
             });
         }
-
-        markCTAActionTriggered();
       } catch (error) {
         console.error("Failed to share invoice:", error);
         toast.error("Failed to generate shareable link", {
           id: "failed-to-generate-shareable-link-error-toast",
         });
 
-        Sentry.captureException(error);
+        console.error(error);
       }
     }
   };
@@ -748,22 +703,6 @@ export function AppPageClient({
         </div>
       </div>
       <Footer />
-      {changelogPopupVariant ? (
-        <ChangelogUpdatePopup
-          variant={changelogPopupVariant}
-          latestChangelog={changelogForPopup}
-          isOpen={isChangelogPopupOpen}
-          onDismiss={dismissChangelogPopup}
-          onHowItWorksClick={() => setIsHowItWorksDialogOpen(true)}
-        />
-      ) : null}
-      <HowItWorksVideoDialog
-        open={isHowItWorksDialogOpen}
-        onOpenChange={setIsHowItWorksDialogOpen}
-      />
-      <div className="fixed right-1.5 top-1.5 z-50 duration-500 animate-in fade-in slide-in-from-top-4">
-        <GitHubStarCTA githubStarsCount={githubStarsCount} />
-      </div>
     </TooltipProvider>
   );
 }

@@ -1,5 +1,3 @@
-import { FooterSkeleton } from "@/app/(components)/footer-skeleton";
-
 export default function Loading() {
   return (
     <div className="flex flex-col items-center justify-start bg-gray-100 md:justify-center lg:min-h-screen">
@@ -35,7 +33,7 @@ export default function Loading() {
           </div>
         </div>
       </div>
-      <FooterSkeleton />
+      <footer className="h-24 w-full animate-pulse bg-slate-100" />
     </div>
   );
 }

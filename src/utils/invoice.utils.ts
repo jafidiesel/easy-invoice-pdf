@@ -1,6 +1,4 @@
 import { SUPPORTED_LANGUAGES, type SupportedLanguages } from "@/app/schema";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-import * as Sentry from "@sentry/nextjs";
 import n2words from "n2words";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -54,13 +52,7 @@ export function getAmountInWords({
     });
 
     if (error instanceof Error) {
-      umamiTrackEvent("error_converting_number_to_words", {
-        data: {
-          error: error?.message ?? "Unknown error",
-        },
-      });
-
-      Sentry.captureException(error);
+      console.error(error);
     }
 
     amountInWords = Math.floor(amount ?? 0).toString();

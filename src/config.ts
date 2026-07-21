@@ -1,26 +1,10 @@
-const port = process.env.PORT || 3000;
-
-export const APP_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
-  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-  : `http://localhost:${port}`;
-
 /**
  * STATIC_ASSETS_URL is used to serve static assets for the PDF templates
  */
 export const STATIC_ASSETS_URL = "https://static.easyinvoicepdf.com";
 
 /**
- * Main demo video on marketing page and "How it works" dialog
- */
-export const VIDEO_DEMO_URL = `${STATIC_ASSETS_URL}/demo-videos/easy-invoice-demo-01-2026-v1.mp4`;
-
-/**
- * Fallback image for main demo video on marketing page and "How it works" dialog
- */
-export const VIDEO_DEMO_FALLBACK_IMG = `${STATIC_ASSETS_URL}/demo-videos/easy-invoice-demo-01-2026-fallback-img-v1.png`;
-
-/**
- * YouTube URL for main demo video on marketing page and "How it works" dialog
+ * YouTube URL for main demo video in the "How it works" dialog
  */
 export const VIDEO_DEMO_YOUTUBE_URL =
   "https://www.youtube.com/embed/iAROeCIcZ40?si=EyJKCsUr43Z8zY1f";
@@ -28,7 +12,7 @@ export const VIDEO_DEMO_YOUTUBE_URL =
 export const YOUTUBE_VIDEO_HOW_TO_ADD_SELLER =
   "https://www.youtube.com/embed/xfSF35c0vfU";
 
-export const YOUTUBE_VIDEO_HOW_TO_ADD_BUYER =
+const YOUTUBE_VIDEO_HOW_TO_ADD_BUYER =
   "https://www.youtube.com/embed/XxAY0YGgXIk";
 
 const YOUTUBE_VIDEO_HOW_TO_ADD_INVOICE_FOR_ONE_WEEK =
@@ -91,75 +75,12 @@ export const HOW_IT_WORKS_VIDEOS = [
 
 export const PROD_WEBSITE_URL = "https://easyinvoicepdf.com";
 
-export const FOUNDER_AVATAR_URL =
-  "https://ik.imagekit.io/fl2lbswwo/avatar.jpeg?updatedAt=1757456439459";
-
 export const GITHUB_URL = "https://github.com/VladSez/easy-invoice-pdf";
-
-export const LINKEDIN_URL = "https://www.linkedin.com/in/vlad-sazonau/";
-
-export const TWITTER_URL = "https://x.com/vladsazonau";
-export const TWITTER_CREATOR = "@vlad_sazonau";
-
-export const PRODUCT_TWITTER_URL = "https://x.com/EasyInvoicePDF";
-
-export const REDDIT_COMMUNITY_URL = "https://www.reddit.com/r/EasyInvoicePDF/";
-export const DISCORD_COMMUNITY_URL = "https://discord.gg/gAr3HteWta";
-export const DISCORD_FEEDBACK_URL = "https://discord.gg/kxTCK2Q7";
-
-export const PERSONAL_WEBSITE_URL = "https://vladsazon.com";
 
 export const BUG_REPORT_URL =
   "https://pdfinvoicegenerator.userjot.com/board/bugs";
 
 export const CONTACT_SUPPORT_EMAIL = "vlad@mail.easyinvoicepdf.com";
-
-/**
- * Marketing features cards for the about page
- */
-export const MARKETING_FEATURES_CARDS = [
-  {
-    translationKey: "livePreview",
-    videoSrc: `${STATIC_ASSETS_URL}/demo-videos/live-preview-v1.mp4`,
-    videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/live-preview-fallback-v1.png`,
-    videoDescription: "Live preview of the invoice as you make changes",
-  },
-  {
-    translationKey: "instantDownload",
-    videoSrc: `${STATIC_ASSETS_URL}/demo-videos/instand-download-v1.mp4`,
-    videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/instant-download-fallback-04-03-2026.png`,
-    videoDescription: "Instant download of the invoice as a PDF file",
-  },
-  {
-    translationKey: "shareableLinks",
-    videoSrc: `${STATIC_ASSETS_URL}/demo-videos/share-invoice-v1.mp4`,
-    videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/share-invoice-fallback-v1.png`,
-    videoDescription: "Shareable links to your invoice",
-  },
-  {
-    translationKey: "taxSupport",
-    videoSrc: `${STATIC_ASSETS_URL}/demo-videos/tax-custom-v1.mp4`,
-    videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/tax-custom-fallback-v1.png`,
-    videoDescription: "Customizable tax system support",
-  },
-  {
-    translationKey: "multiLanguage",
-    videoSrc: `${STATIC_ASSETS_URL}/demo-videos/multi-lang-v1.mp4`,
-    videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/multi-lang-fallback-v1.png`,
-    videoDescription: "Multiple languages and currencies support",
-  },
-  {
-    translationKey: "openSource",
-    videoSrc: `${STATIC_ASSETS_URL}/demo-videos/open-source-v1.mp4`,
-    videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/open-source-fallback-v1.png`,
-    videoDescription: "Open source invoice generator",
-  },
-] as const satisfies {
-  translationKey: string;
-  videoSrc: string;
-  videoFallbackImg: string;
-  videoDescription: string;
-}[];
 
 /**
  * Fonts that we use to render invoice pdf templates via `@react-pdf/renderer`

@@ -18,10 +18,7 @@ const config: KnipConfig = {
   ignore: [
     "src/app/**/invoice-pdf-download-multiple-languages.tsx",
     "src/components/ui/**/*.tsx",
-    "global.ts",
-    "src/i18n/**/*",
     "src/app/schema/**/*",
-    "src/app/changelog/content/**/*",
     "src/app/(app)/pdf-i18n-translations/pdf-translations.ts",
   ],
   includeEntryExports: true,
