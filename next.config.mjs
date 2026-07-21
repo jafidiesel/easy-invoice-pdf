@@ -38,6 +38,12 @@ validateInvoicePDFTranslationFiles().catch((error) => {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Static export: produces plain HTML/CSS/JS in `out/`, served by Apache (no Node.js runtime)
+  // https://nextjs.org/docs/app/guides/static-exports
+  output: "export",
+  images: {
+    unoptimized: true,
+  },
   typescript: {
     ignoreBuildErrors: true,
   },

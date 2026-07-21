@@ -8,6 +8,7 @@ import {
   type BuyerData,
 } from "../schema";
 import { INVOICE_PDF_TRANSLATIONS } from "../(app)/pdf-i18n-translations/pdf-translations";
+import { env } from "@/env";
 import dayjs from "dayjs";
 
 /**
@@ -203,10 +204,11 @@ export function getInitialInvoiceData() {
 }
 
 /**
- * Preloaded seller/buyer/price values sourced from server env vars (see src/env.ts).
- * Every field is optional — only the ones actually set in .env are applied.
+ * Preloaded seller/buyer/price values sourced from NEXT_PUBLIC_* env vars
+ * (see src/env.ts). Every field is optional — only the ones actually set in
+ * .env are applied.
  */
-export interface InvoiceEnvDefaults {
+interface InvoiceEnvDefaults {
   seller?: Partial<
     Pick<
       SellerData,
@@ -255,5 +257,53 @@ export function applyInvoiceEnvDefaults(
     seller: { ...data.seller, ...seller },
     buyer: { ...data.buyer, ...buyer },
     items,
+  };
+}
+
+/**
+ * Reads the NEXT_PUBLIC_SELLER_/NEXT_PUBLIC_BUYER_/NEXT_PUBLIC_INVOICE_NET_PRICE
+ * values that got compiled into the client bundle at build time (see src/env.ts)
+ * and shapes them into `InvoiceEnvDefaults` for `applyInvoiceEnvDefaults`.
+ */
+export function getInvoiceEnvDefaults(): InvoiceEnvDefaults {
+  const seller = {
+    ...(env.NEXT_PUBLIC_SELLER_NAME && { name: env.NEXT_PUBLIC_SELLER_NAME }),
+    ...(env.NEXT_PUBLIC_SELLER_ADDRESS && {
+      address: env.NEXT_PUBLIC_SELLER_ADDRESS,
+    }),
+    ...(env.NEXT_PUBLIC_SELLER_VAT_NO && {
+      vatNo: env.NEXT_PUBLIC_SELLER_VAT_NO,
+    }),
+    ...(env.NEXT_PUBLIC_SELLER_EMAIL && {
+      email: env.NEXT_PUBLIC_SELLER_EMAIL,
+    }),
+    ...(env.NEXT_PUBLIC_SELLER_ACCOUNT_NUMBER && {
+      accountNumber: env.NEXT_PUBLIC_SELLER_ACCOUNT_NUMBER,
+    }),
+    ...(env.NEXT_PUBLIC_SELLER_SWIFT_BIC && {
+      swiftBic: env.NEXT_PUBLIC_SELLER_SWIFT_BIC,
+    }),
+  };
+
+  const buyer = {
+    ...(env.NEXT_PUBLIC_BUYER_NAME && { name: env.NEXT_PUBLIC_BUYER_NAME }),
+    ...(env.NEXT_PUBLIC_BUYER_ADDRESS && {
+      address: env.NEXT_PUBLIC_BUYER_ADDRESS,
+    }),
+    ...(env.NEXT_PUBLIC_BUYER_VAT_NO && {
+      vatNo: env.NEXT_PUBLIC_BUYER_VAT_NO,
+    }),
+    ...(env.NEXT_PUBLIC_BUYER_EMAIL && { email: env.NEXT_PUBLIC_BUYER_EMAIL }),
+  };
+
+  const itemNetPrice = env.NEXT_PUBLIC_INVOICE_NET_PRICE
+    ? Number(env.NEXT_PUBLIC_INVOICE_NET_PRICE)
+    : undefined;
+
+  return {
+    ...(Object.keys(seller).length > 0 && { seller }),
+    ...(Object.keys(buyer).length > 0 && { buyer }),
+    ...(itemNetPrice !== undefined &&
+      !Number.isNaN(itemNetPrice) && { itemNetPrice }),
   };
 }

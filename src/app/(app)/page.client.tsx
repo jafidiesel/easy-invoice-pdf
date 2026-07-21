@@ -3,7 +3,7 @@
 import {
   applyInvoiceEnvDefaults,
   getInitialInvoiceData,
-  type InvoiceEnvDefaults,
+  getInvoiceEnvDefaults,
 } from "@/app/constants";
 import {
   invoiceSchema,
@@ -34,7 +34,7 @@ import {
   decompressFromEncodedURIComponent,
 } from "lz-string";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { InvoiceClientPage } from "./components";
@@ -43,6 +43,9 @@ import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaki
 
 // TODO: enable later when PRO version is released, this is PRO FEATURE =)
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
+
+// Computed once: sourced from NEXT_PUBLIC_* vars inlined into the bundle at build time
+const envDefaults = getInvoiceEnvDefaults();
 
 /**
  * Main client component for the invoice application page.
@@ -58,11 +61,15 @@ import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaki
  *
  * @returns The rendered invoice application page with form, preview, and controls
  */
-export function AppPageClient({
-  envDefaults,
-}: {
-  envDefaults?: InvoiceEnvDefaults;
-}) {
+export function AppPageClient() {
+  return (
+    <Suspense fallback={null}>
+      <AppPageClientInner />
+    </Suspense>
+  );
+}
+
+function AppPageClientInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -177,18 +184,22 @@ export function AppPageClient({
 
         setInvoiceDataState(parsedData);
       } else {
-        if (templateValidation.success) {
-          // if no data in local storage and template is in url, set initial data with template from url
-          setInvoiceDataState({
-            ...applyInvoiceEnvDefaults(getInitialInvoiceData(), envDefaults),
-            template: templateValidation.data,
-          });
-        } else {
-          // if no data in local storage, set initial data
-          setInvoiceDataState(
-            applyInvoiceEnvDefaults(getInitialInvoiceData(), envDefaults),
-          );
-        }
+        // no data in local storage yet: seed it from .env defaults (if any)
+        // and persist immediately, so the env-preloaded data survives even if
+        // the user never edits the form (e.g. downloads the PDF right away)
+        const seededData = templateValidation.success
+          ? {
+              ...applyInvoiceEnvDefaults(getInitialInvoiceData(), envDefaults),
+              template: templateValidation.data,
+            }
+          : applyInvoiceEnvDefaults(getInitialInvoiceData(), envDefaults);
+
+        localStorage.setItem(
+          PDF_DATA_LOCAL_STORAGE_KEY,
+          JSON.stringify(seededData),
+        );
+
+        setInvoiceDataState(seededData);
       }
     } catch (error) {
       console.error("Failed to load saved invoice data:", error);

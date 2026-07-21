@@ -1,5 +1,4 @@
 import { DeviceContextProvider } from "@/contexts/device-context";
-import { checkDeviceUserAgent } from "@/lib/check-device.server";
 import { ResponsiveIndicator } from "@/components/dev/responsive-indicator";
 
 import type { Metadata, Viewport } from "next";
@@ -45,27 +44,15 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const {
-    isDesktop: isDesktopServer,
-    isAndroid,
-    isMobile,
-    inAppInfo,
-  } = await checkDeviceUserAgent();
-
   return (
     <html lang="en">
       <body>
-        <DeviceContextProvider
-          isDesktop={isDesktopServer}
-          isAndroid={isAndroid}
-          isMobile={isMobile}
-          inAppInfo={inAppInfo}
-        >
+        <DeviceContextProvider>
           {children}
 
           {/* https://sonner.emilkowal.ski/ */}

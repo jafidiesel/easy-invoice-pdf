@@ -52,6 +52,15 @@ vi.mock("@/utils/is-telegram-in-app-browser", () => ({
   isTelegramInAppBrowser: vi.fn(() => false),
 }));
 
+vi.mock("@/lib/check-device", () => ({
+  checkDeviceUserAgent: vi.fn(() => ({
+    isDesktop: true,
+    isAndroid: false,
+    isMobile: false,
+    inAppInfo: { isInApp: false, name: null },
+  })),
+}));
+
 vi.mock("@/app/(app)/utils/get-app-metadata", () => ({
   updateAppMetadata: vi.fn(),
 }));
@@ -74,6 +83,7 @@ vi.mock("sonner", () => ({
 
 import { InvoicePDFDownloadLink } from "../invoice-pdf-download-link";
 import { isTelegramInAppBrowser } from "@/utils/is-telegram-in-app-browser";
+import { checkDeviceUserAgent } from "@/lib/check-device";
 import { updateAppMetadata } from "@/app/(app)/utils/get-app-metadata";
 import { haptic } from "@/lib/haptic";
 import { ErrorGeneratingPdfToast } from "@/components/ui/toasts/error-generating-pdf-toast";
@@ -96,14 +106,16 @@ function renderInvoicePDFDownloadLink({
   isMobile = false,
   inAppInfo = { isInApp: false, name: null },
 }: RenderOptions = {}) {
+  vi.mocked(checkDeviceUserAgent).mockReturnValue({
+    isDesktop: true,
+    isAndroid: false,
+    isMobile,
+    inAppInfo,
+  });
+
   return render(
     <TooltipProvider delayDuration={0}>
-      <DeviceContextProvider
-        isDesktop
-        isAndroid={false}
-        isMobile={isMobile}
-        inAppInfo={inAppInfo}
-      >
+      <DeviceContextProvider>
         <InvoicePDFDownloadLink
           invoiceData={invoiceData}
           errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
