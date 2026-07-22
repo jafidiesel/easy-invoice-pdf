@@ -36,11 +36,18 @@ validateInvoicePDFTranslationFiles().catch((error) => {
   process.exit(1);
 });
 
+// Set this when the site is served from a subpath instead of the domain root,
+// e.g. `BASE_PATH=/invoice npm run build` for http://pi.local/invoice
+// Without it, all /_next/static/* asset URLs are generated as if the site
+// lived at "/", which 404s when Apache serves it under a subdirectory.
+const basePath = process.env.BASE_PATH || "";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Static export: produces plain HTML/CSS/JS in `out/`, served by Apache (no Node.js runtime)
   // https://nextjs.org/docs/app/guides/static-exports
   output: "export",
+  basePath,
   images: {
     unoptimized: true,
   },

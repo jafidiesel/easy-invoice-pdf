@@ -73,8 +73,6 @@ export const HOW_IT_WORKS_VIDEOS = [
   iframeTitle: string;
 }[];
 
-export const PROD_WEBSITE_URL = "https://easyinvoicepdf.com";
-
 export const GITHUB_URL = "https://github.com/VladSez/easy-invoice-pdf";
 
 export const BUG_REPORT_URL =

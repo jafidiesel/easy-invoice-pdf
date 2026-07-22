@@ -9,7 +9,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "build:pi": "BASE_PATH=/invoice npm run build",
+    "start": "npx serve@latest out",
+    "tar": "tar -czvf out.tar.gz ./out",
+    "serve": "python3 -m http.server 8000",
     "type-check": "tsc --noEmit --diagnostics",
     "type-check:go": "tsgo --diagnostics",
     "lint": "eslint . --cache",

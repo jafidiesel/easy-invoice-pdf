@@ -229,7 +229,7 @@ export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
 
   const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
   const invoiceNumber = `${invoiceNumberValue}`;
-  const invoiceDocTitle = `Invoice ${invoiceNumber} | Created with https://easyinvoicepdf.com`;
+  const invoiceDocTitle = `Invoice ${invoiceNumber}`;
 
   const formattedInvoiceTotal = formatCurrency({
     amount: invoiceData?.total,

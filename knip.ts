@@ -25,7 +25,7 @@ const config: KnipConfig = {
   // ignore tags
   // https://knip.dev/reference/configuration#tags
   tags: ["-@lintignore"],
-  ignoreBinaries: ["act", "zizmor", "printf", "cloudflared"],
+  ignoreBinaries: ["act", "zizmor", "printf", "cloudflared", "tar", "python3"],
 };
 
 export default config;
